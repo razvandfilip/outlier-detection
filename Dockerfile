@@ -1,7 +1,7 @@
 FROM java:openjdk-8-jre
 
 RUN apt-get update || true && \
-    apt-get install -y wget supervisor && \
+    apt-get install -y wget supervisor vim less && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \
     mkdir /opt/kafka && \
@@ -9,6 +9,6 @@ RUN apt-get update || true && \
     tar xzf /tmp/kafka_2.12-2.3.0.tgz -C /opt/kafka && \
     rm /tmp/kafka_2.12-2.3.0.tgz 
 
-ADD supervisor/zookeeper.conf /etc/supervisor/conf.d/    
+ADD supervisor/zookeeper.conf supervisor/kafka.conf /etc/supervisor/conf.d/    
 
 CMD ["supervisord", "-n"]
