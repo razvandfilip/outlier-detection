@@ -17,8 +17,15 @@ public class TestDataRunner implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(TestDataRunner.class);
 
-    @Autowired
+    private TestDataRunnerProperties properties;
+
     private Tbean tbean;
+
+    @Autowired
+    public TestDataRunner(TestDataRunnerProperties properties, Tbean tbean) {
+        this.properties = properties;
+        this.tbean = tbean;
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,6 +48,6 @@ public class TestDataRunner implements CommandLineRunner {
             scheduledExecutorService.shutdown();
             executorService.shutdown();
         };
-        scheduledExecutorService.schedule(cancelTest, 10, TimeUnit.SECONDS);
+        scheduledExecutorService.schedule(cancelTest, properties.getTestDuration(), TimeUnit.SECONDS);
     }
 }
