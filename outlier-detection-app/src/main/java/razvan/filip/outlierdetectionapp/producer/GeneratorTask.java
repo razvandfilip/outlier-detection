@@ -3,7 +3,9 @@ package razvan.filip.outlierdetectionapp.producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GeneratorTask implements Runnable {
 
@@ -11,8 +13,10 @@ public class GeneratorTask implements Runnable {
     private Tbean tbean;
     private int duration;
     private Random random;
+    private MessageProducer producer;
     
-    public GeneratorTask(Tbean tbean, int duration) {
+    public GeneratorTask(MessageProducer producer, Tbean tbean, int duration) {
+        this.producer = producer;
         this.tbean = tbean;
         this.duration = duration;
         this.random = new Random(System.currentTimeMillis());
@@ -23,10 +27,24 @@ public class GeneratorTask implements Runnable {
         final long endTime = System.currentTimeMillis() + duration*1000;
 
         while (System.currentTimeMillis() < endTime) {
-           logger.info("Logging tbean {} from task {}", tbean.get(), this.toString()); 
+           logger.info("Logging tbean {} from task {}", tbean.get(), this.toString());
+           Reading reading = generateReadings();
+           producer.send(reading);
            try {
-               Thread.sleep(1976);
+               Thread.sleep(random.nextInt(1800) + 200);
            } catch (InterruptedException ignored) {}
         }
+    }
+
+    private Reading generateReadings() {
+        Reading reading = new Reading();
+        reading.setPublisherId(String.valueOf(random.nextInt(10)));
+        reading.setTime(LocalDateTime.now());
+        reading.setReadings(
+                random.ints(random.nextInt(10) + 5,0 ,5000)
+                        .boxed()
+                        .collect(Collectors.toList())
+        );
+        return reading;
     }
 }

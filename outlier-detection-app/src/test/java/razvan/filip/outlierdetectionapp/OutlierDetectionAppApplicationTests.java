@@ -3,10 +3,10 @@ package razvan.filip.outlierdetectionapp;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class OutlierDetectionAppApplicationTests {
 
-	@Test
+//	@Test
 	void contextLoads() {
 	}
 

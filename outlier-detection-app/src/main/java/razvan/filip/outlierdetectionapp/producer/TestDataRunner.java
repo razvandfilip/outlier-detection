@@ -18,12 +18,13 @@ public class TestDataRunner implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(TestDataRunner.class);
 
     private TestDataRunnerProperties properties;
-
+    private MessageProducer producer;
     private Tbean tbean;
 
     @Autowired
-    public TestDataRunner(TestDataRunnerProperties properties, Tbean tbean) {
+    public TestDataRunner(TestDataRunnerProperties properties, MessageProducer producer, Tbean tbean) {
         this.properties = properties;
+        this.producer = producer;
         this.tbean = tbean;
     }
 
@@ -33,12 +34,11 @@ public class TestDataRunner implements CommandLineRunner {
 
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
         ExecutorService executorService = Executors.newFixedThreadPool(4);
-
         Runnable taskSubmitter = () -> {
             logger.info("Scheduling more tasks");
-            executorService.execute(new GeneratorTask(tbean, 3));
-            executorService.execute(new GeneratorTask(tbean, 4));
-            executorService.execute(new GeneratorTask(tbean, 5));
+            executorService.execute(new GeneratorTask(producer, tbean, 3));
+            executorService.execute(new GeneratorTask(producer, tbean, 4));
+            executorService.execute(new GeneratorTask(producer, tbean, 5));
         };
 
         ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(taskSubmitter, 0, 4, TimeUnit.SECONDS);
