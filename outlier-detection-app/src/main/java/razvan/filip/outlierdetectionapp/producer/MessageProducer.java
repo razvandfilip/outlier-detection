@@ -30,7 +30,6 @@ public class MessageProducer {
             public void onFailure(Throwable ex) {
                 logger.error("Could not sent message to kafka topic", ex);
             }
-
             @Override
             public void onSuccess(SendResult<String, Reading> result) {
                 logger.info("Sent message to kafka topic");
