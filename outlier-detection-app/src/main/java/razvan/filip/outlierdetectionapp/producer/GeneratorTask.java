@@ -2,9 +2,10 @@ package razvan.filip.outlierdetectionapp.producer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import razvan.filip.outlierdetectionapp.model.Reading;
 
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class GeneratorTask implements Runnable {
@@ -12,14 +13,14 @@ public class GeneratorTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(GeneratorTask.class);
     private Tbean tbean;
     private int duration;
-    private Random random;
+    private ThreadLocalRandom random;
     private MessageProducer producer;
     
     public GeneratorTask(MessageProducer producer, Tbean tbean, int duration) {
         this.producer = producer;
         this.tbean = tbean;
         this.duration = duration;
-        this.random = new Random(System.currentTimeMillis());
+        this.random = ThreadLocalRandom.current();
     }
 
     @Override
@@ -38,7 +39,7 @@ public class GeneratorTask implements Runnable {
 
     private Reading generateReadings() {
         Reading reading = new Reading();
-        reading.setPublisherId(String.valueOf(random.nextInt(10)));
+        reading.setPublisherId(String.valueOf(random.nextInt(10) + 1));
         reading.setTime(LocalDateTime.now());
         reading.setReadings(
                 random.ints(random.nextInt(10) + 5,0 ,5000)

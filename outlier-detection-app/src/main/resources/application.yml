@@ -18,7 +18,7 @@ spring:
         spring:
           json:
             trusted:
-              packages: razvan.filip.outlierdetectionapp.producer
+              packages: razvan.filip.outlierdetectionapp.model
   jackson:
     serialization:
       write_dates_as_timestamps: false

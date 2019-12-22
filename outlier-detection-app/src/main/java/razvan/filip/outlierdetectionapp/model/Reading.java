@@ -1,4 +1,4 @@
-package razvan.filip.outlierdetectionapp.producer;
+package razvan.filip.outlierdetectionapp.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
