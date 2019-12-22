@@ -12,8 +12,13 @@ spring:
       group-id: group_id
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       missing-topics-fatal: false
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: razvan.filip.outlierdetectionapp.producer
   jackson:
     serialization:
       write_dates_as_timestamps: false
