@@ -26,6 +26,8 @@ RUN apt-get update || true && \
     mkdir -p /app/logs/outlier-detection
 
 ADD supervisor/zookeeper.conf supervisor/kafka.conf supervisor/outlier-detection.conf supervisor/mongod.conf /etc/supervisor/conf.d/
+ADD run.sh /app/
+RUN chmod +x /app/run.sh
 
 COPY --from=GRADLE_BUILD /build/build/libs/outlier-detection-app-0.0.1-SNAPSHOT.jar /app/
 

@@ -50,7 +50,7 @@ public class OutlierService {
         logger.info("Their median absolute deviation is {}", medianAbsoluteDeviation);
 
         List<DataPoint> foundOutliers = dataPoints.stream()
-                .filter(dataPoint -> Math.abs(dataPoint.getDataValue() - median) > 3 * medianAbsoluteDeviation)
+                .filter(dataPoint -> Math.abs(dataPoint.getDataValue() - median) > 5 * medianAbsoluteDeviation)
                 .collect(Collectors.toList());
 
         logger.info("There are {} outliers: {}", foundOutliers.size(), foundOutliers);

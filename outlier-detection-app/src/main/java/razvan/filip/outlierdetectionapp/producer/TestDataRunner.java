@@ -19,29 +19,27 @@ public class TestDataRunner implements CommandLineRunner {
 
     private TestDataRunnerProperties properties;
     private MessageProducer producer;
-    private Tbean tbean;
 
     @Autowired
-    public TestDataRunner(TestDataRunnerProperties properties, MessageProducer producer, Tbean tbean) {
+    public TestDataRunner(TestDataRunnerProperties properties, MessageProducer producer) {
         this.properties = properties;
         this.producer = producer;
-        this.tbean = tbean;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("From clr"); 
-
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
         ExecutorService executorService = Executors.newFixedThreadPool(4);
         Runnable taskSubmitter = () -> {
             logger.info("Scheduling more tasks");
-            executorService.execute(new GeneratorTask(producer, tbean, 3));
-            executorService.execute(new GeneratorTask(producer, tbean, 10));
-            executorService.execute(new GeneratorTask(producer, tbean, 20));
+            executorService.execute(new GeneratorTask(producer, properties.getTestDuration(), "1"));
+            executorService.execute(new GeneratorTask(producer, properties.getTestDuration(), "2"));
+            executorService.execute(new GeneratorTask(producer, properties.getTestDuration(), "3"));
+            executorService.execute(new GeneratorTask(producer, properties.getTestDuration(), "4"));
+            executorService.execute(new GeneratorTask(producer, properties.getTestDuration(), "5"));
         };
 
-        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(taskSubmitter, 0, 5, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(taskSubmitter, 0, properties.getTestDuration() + 5, TimeUnit.SECONDS);
 
         Runnable cancelTest = () -> {
             scheduledFuture.cancel(true);
