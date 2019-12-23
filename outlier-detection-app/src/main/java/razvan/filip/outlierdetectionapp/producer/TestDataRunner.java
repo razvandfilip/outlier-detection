@@ -37,11 +37,11 @@ public class TestDataRunner implements CommandLineRunner {
         Runnable taskSubmitter = () -> {
             logger.info("Scheduling more tasks");
             executorService.execute(new GeneratorTask(producer, tbean, 3));
-            executorService.execute(new GeneratorTask(producer, tbean, 4));
-            executorService.execute(new GeneratorTask(producer, tbean, 5));
+            executorService.execute(new GeneratorTask(producer, tbean, 10));
+            executorService.execute(new GeneratorTask(producer, tbean, 20));
         };
 
-        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(taskSubmitter, 0, 4, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(taskSubmitter, 0, 5, TimeUnit.SECONDS);
 
         Runnable cancelTest = () -> {
             scheduledFuture.cancel(true);

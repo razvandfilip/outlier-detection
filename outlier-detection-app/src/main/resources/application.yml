@@ -1,5 +1,5 @@
 test-data:
-  test-duration: 10
+  test-duration: 60
 
 spring:
   kafka:
