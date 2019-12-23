@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import razvan.filip.outlierdetectionapp.consumer.entity.DataPoint;
-import razvan.filip.outlierdetectionapp.consumer.repository.DataPointRepository;
+import razvan.filip.outlierdetectionapp.entity.DataPoint;
+import razvan.filip.outlierdetectionapp.repository.DataPointRepository;
 import razvan.filip.outlierdetectionapp.model.Reading;
 
 import static org.mockito.Mockito.*;

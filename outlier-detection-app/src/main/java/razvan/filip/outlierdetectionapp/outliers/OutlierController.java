@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import razvan.filip.outlierdetectionapp.entity.DataPoint;
+
+import java.util.List;
 
 @RestController
 public class OutlierController {
@@ -20,12 +23,12 @@ public class OutlierController {
     }
 
     @GetMapping("/outliers")
-    public String getOutliers(@RequestParam String publisherId, @RequestParam(defaultValue = "50") int windowSize) {
+    public List<DataPoint> getOutliers(@RequestParam String publisherId, @RequestParam(defaultValue = "50") int windowSize) {
 
         logger.info("Got request for publisherId {} and windowSize {}", publisherId, windowSize);
 
-        String result = outlierService.getOutliers(publisherId, windowSize);
-        logger.info(result);
+        List<DataPoint> result = outlierService.getOutliers(publisherId, windowSize);
+        logger.info("Found outliers: {}", result);
         return result;
     }
 }

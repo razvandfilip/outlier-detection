@@ -1,11 +1,11 @@
-package razvan.filip.outlierdetectionapp.consumer.entity;
+package razvan.filip.outlierdetectionapp.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 
 import java.time.LocalDateTime;
 
-@CompoundIndex(def = "{'publisherId':1, 'time':1}", name = "compound_index")
+@CompoundIndex(def = "{'publisherId':1, 'time':-1}", name = "compound_index")
 public class DataPoint {
 
     @Id

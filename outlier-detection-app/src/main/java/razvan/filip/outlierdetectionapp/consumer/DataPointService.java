@@ -4,11 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import razvan.filip.outlierdetectionapp.consumer.entity.DataPoint;
-import razvan.filip.outlierdetectionapp.consumer.repository.DataPointRepository;
+import razvan.filip.outlierdetectionapp.entity.DataPoint;
+import razvan.filip.outlierdetectionapp.repository.DataPointRepository;
 import razvan.filip.outlierdetectionapp.model.Reading;
-
-import java.util.stream.Collectors;
 
 @Service
 public class DataPointService {

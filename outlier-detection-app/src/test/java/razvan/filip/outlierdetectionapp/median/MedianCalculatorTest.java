@@ -1,4 +1,4 @@
-package razvan.filip.outlierdetectionapp.consumer;
+package razvan.filip.outlierdetectionapp.median;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,24 +15,24 @@ public class MedianCalculatorTest {
     public void testEmptyList() {
         List<Integer> integers = Collections.emptyList();
         MedianCalculator medianCalculator = new MedianCalculator();
-        assertThatThrownBy(() -> medianCalculator.median(integers))
+        assertThatThrownBy(() -> medianCalculator.median(integers.stream(), Double::valueOf))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("List should not be empty.");
+                .hasMessageContaining("Stream should not be empty.");
     }
 
     @Test
     public void testNullParameter() {
         MedianCalculator medianCalculator = new MedianCalculator();
-        assertThatThrownBy(() -> medianCalculator.median(null))
+        assertThatThrownBy(() -> medianCalculator.median(null, null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("List should not be null.");
+                .hasMessageContaining("Stream should not be null.");
     }
 
     @Test
     public void testSingleElementList() {
         List<Integer> integers = Collections.singletonList(5);
         MedianCalculator medianCalculator = new MedianCalculator();
-        double median = medianCalculator.median(integers);
+        double median = medianCalculator.median(integers.stream(), Double::valueOf);
         assertThat(median).isEqualTo(5);
     }
 
@@ -40,7 +40,7 @@ public class MedianCalculatorTest {
     public void testOddSizeList() {
         List<Integer> integers = Arrays.asList(18, 3, 42, 84, 15);
         MedianCalculator medianCalculator = new MedianCalculator();
-        double median = medianCalculator.median(integers);
+        double median = medianCalculator.median(integers.stream(), Double::valueOf);
         assertThat(median).isEqualTo(18);
     }
 
@@ -48,7 +48,7 @@ public class MedianCalculatorTest {
     public void testEvenSizeList() {
         List<Integer> integers = Arrays.asList(18, 3, 42, 84, 15, 1);
         MedianCalculator medianCalculator = new MedianCalculator();
-        double median = medianCalculator.median(integers);
+        double median = medianCalculator.median(integers.stream(), Double::valueOf);
         assertThat(median).isEqualTo(16.5);
     }
 }

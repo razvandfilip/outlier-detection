@@ -3,96 +3,58 @@ package razvan.filip.outlierdetectionapp.outliers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import razvan.filip.outlierdetectionapp.consumer.entity.DataPoint;
+import razvan.filip.outlierdetectionapp.entity.DataPoint;
+import razvan.filip.outlierdetectionapp.median.MedianCalculator;
+import razvan.filip.outlierdetectionapp.repository.DataPointRepository;
 
-import java.time.LocalDateTime;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 @Service
 public class OutlierService {
 
     private static final Logger logger = LoggerFactory.getLogger(OutlierService.class);
 
-    private MongoTemplate mongoTemplate;
+    private MedianCalculator medianCalculator;
+    private DataPointRepository dataPointRepository;
 
     @Autowired
-    public OutlierService(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
+    public OutlierService(MedianCalculator medianCalculator, DataPointRepository dataPointRepository) {
+        this.medianCalculator = medianCalculator;
+        this.dataPointRepository = dataPointRepository;
     }
 
 
-    public String getOutliers(String publisherId, int windowSize) {
+    public List<DataPoint> getOutliers(String publisherId, int windowSize) {
 
+        List<DataPoint> dataPoints = dataPointRepository.getDataPointWindow(publisherId, windowSize);
 
-        Criteria findCriteria = Criteria.where("publisherId").is(publisherId).and("time").lte(LocalDateTime.now());
-        Query query = new Query(findCriteria);
-        query.with(Sort.by(Sort.Direction.DESC, "time"));
-        query.limit(windowSize);
-        List<DataPoint> dataPoints = mongoTemplate.find(query, DataPoint.class);
+        if (dataPoints.isEmpty()) {
+            logger.info("No dataPoints found for publisherId {}", publisherId);
+            return Collections.emptyList();
+        }
 
         logger.info("Found {} dataPoints for publisherId {}", dataPoints.size(), publisherId);
 
-        DoubleStream values = dataPoints.stream().mapToDouble(DataPoint::getDataValue);
-        double median = median(values, dataPoints.size());
+        double median = medianCalculator.median(dataPoints.stream(), DataPoint::getDataValue);
 
         logger.info("Their median is {}", median);
 
-        // calculate median
-        // median (datapoints)
-
-//        dataPoints.sort((Comparator.comparing(DataPoint::getTime)));
-
-        /*double median = 0;
-
-        if (dataPoints.size() % 2 == 0) {
-            median = (dataPoints.get(dataPoints.size() / 2).getDataValue() + dataPoints.get(dataPoints.size() / 2 - 1).getDataValue()) / 2;
-        } else {
-            median = dataPoints.get(dataPoints.size() / 2).getDataValue();
-        }*/
-
-        // calculate absolute deviation from median
-        // for datapoints, map datapoint -> abs (datapoint - median)
-
-        DoubleStream deviationsFromMedian = dataPoints.stream().mapToDouble(DataPoint::getDataValue).map(value -> Math.abs(value - median));
-        Double medianAbsoluteDeviation = median(deviationsFromMedian, dataPoints.size());
+        double medianAbsoluteDeviation = medianCalculator.median(
+                dataPoints.stream().map(dataPoint -> Math.abs(dataPoint.getDataValue() - median)),
+                Function.identity());
 
         logger.info("Their median absolute deviation is {}", medianAbsoluteDeviation);
 
-        // calculate median of absolute deviations from the median
-        // median (deviations)
-
-        List<DataPoint> outliers2 = dataPoints.stream().filter(dataPoint -> Math.abs(dataPoint.getDataValue() - median) > 3 * medianAbsoluteDeviation)
+        List<DataPoint> foundOutliers = dataPoints.stream()
+                .filter(dataPoint -> Math.abs(dataPoint.getDataValue() - median) > 3 * medianAbsoluteDeviation)
                 .collect(Collectors.toList());
 
-        logger.info("There are {} outliers", outliers2.size());
+        logger.info("There are {} outliers: {}", foundOutliers.size(), foundOutliers);
 
-        String outliers = dataPoints.stream().filter(dataPoint -> Math.abs(dataPoint.getDataValue() - median) > 3 * medianAbsoluteDeviation)
-                .map(dataPoint ->
-                        "[id " + dataPoint.getId() +
-                                " pid " + dataPoint.getPublisherId() +
-                                " time " + dataPoint.getTime() +
-                                " value " + dataPoint.getDataValue() + "]")
-                .collect(Collectors.joining(","));
-
-        logger.info("Result: {}", outliers);
-
-        // for datapoints, filter datapoint -> abs(datapoint - median) > 5 * MAD
-
-        return outliers;
-    }
-
-    private Double median(DoubleStream values, int size) {
-        DoubleStream sortedValues = values.sorted();
-        return size % 2 == 0 ?
-                sortedValues.skip(size/2-1).limit(2).average().getAsDouble():
-                sortedValues.skip(size/2).findFirst().getAsDouble();
+        return foundOutliers;
     }
 }
